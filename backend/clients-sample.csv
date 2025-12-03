@@ -1,0 +1,11 @@
+orderNumber,phoneNumber,name,address,city,postalCode,houseNumber,apartment,deliveryNotes,status,orderCount,totalSpent
+1001,06 12 34 56 78,Jean Dupont,123 Rue de Paris,Paris,75001,123,,Appeler à l'arrivée,Actif,5,145.50
+1002,06 23 45 67 89,Marie Martin,456 Avenue Victor Hugo,Lyon,69000,456,Apt 3B,Laisser au portail,Actif,12,380.25
+1003,06 34 56 78 90,Pierre Bernard,789 Boulevard Saint-Germain,Paris,75005,789,,Pas de sonnette,Actif,3,92.00
+1004,06 45 67 89 01,Sophie Laurent,321 Rue de Rivoli,Marseille,13000,321,Rez-de-chaussée,Laisser devant la porte,Inactif,8,267.80
+1005,06 56 78 90 12,Luc Dubois,654 Chemin des Écoles,Toulouse,31000,654,Apt 5C,Appeler 10 min avant,Actif,15,520.40
+1006,06 67 89 01 23,Caroline Moreau,987 Place de la Concorde,Paris,75008,987,,Interphone code 1234,Actif,2,58.50
+1007,06 78 90 12 34,Michel Lefevre,135 Rue Lepic,Paris,75018,135,Apt 2A,Sonnette cassée,Bloqué,0,0.00
+1008,06 89 01 23 45,Isabelle Girard,246 Avenue Foch,Paris,75016,246,,Très urgentissime,Actif,25,890.75
+1009,06 90 12 34 56,François Durand,357 Boulevard Haussmann,Paris,75009,357,Apt 7D,Sonnette à gauche,Actif,7,201.30
+1010,07 01 23 45 67,Nathalie Petit,468 Quai de la Seine,Paris,75004,468,,Livraison rapide SVP,Actif,18,650.20
