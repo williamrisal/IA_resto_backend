@@ -1,0 +1,41 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: paneladmin_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: SecurePassword2024!
+      MONGO_INITDB_DATABASE: resto-db
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    networks:
+      - paneladmin-network
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: paneladmin_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:SecurePassword2024!@mongodb:27017/resto-db?authSource=admin
+      - PORT=5000
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-12345
+      - CLIENT_URL=http://myrestoia.s3-website.eu-north-1.amazonaws.com
+    depends_on:
+      - mongodb
+    networks:
+      - paneladmin-network
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+  mongo_config:
+
+networks:
+  paneladmin-network:
+    driver: bridge
