@@ -5,8 +5,10 @@ const router = express.Router()
 
 /**
  * Routes d'authentification
- * Note: Le register est désactivé. Les entreprises sont ajoutées via script.
  */
+
+// POST /api/auth/register - Inscription d'une nouvelle entreprise
+router.post('/register', authController.register)
 
 // POST /api/auth/login - Connexion
 router.post('/login', authController.login)
