@@ -54,14 +54,17 @@ export const getMenuItemById = async (req, res) => {
  */
 export const createMenuItem = async (req, res) => {
     try {
+        console.log('📥 Données reçues pour création menu:', req.body)
         const newItem = new MenuItem(req.body)
         const savedItem = await newItem.save()
+        console.log('✅ Article créé avec succès:', savedItem._id)
         res.status(201).json({
             success: true,
             message: 'Article créé avec succès',
             data: savedItem,
         })
     } catch (error) {
+        console.error('❌ Erreur création menu:', error.message)
         res.status(400).json({
             success: false,
             message: 'Erreur lors de la création de l\'article',
