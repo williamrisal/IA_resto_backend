@@ -111,12 +111,13 @@ const entrepriseSchema = new mongoose.Schema(
 entrepriseSchema.pre('save', async function (next) {
     // Si le password n'a pas été modifié, on continue
     if (!this.isModified('password')) {
-        next()
+        return next()
     }
 
     // Générer un salt et hasher le password
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
+    next()
 })
 
 /**
