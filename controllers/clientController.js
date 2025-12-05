@@ -59,19 +59,19 @@ export const getClientByPhone = async (req, res) => {
         
         console.log('🔍 Recherche client avec téléphone:', phone)
         
-        // Chercher avec le numéro nettoyé
-        let client = await Client.findOne({ phone }).populate('entrepriseId', 'name email')
+        // Chercher avec le numéro nettoyé (le champ en base est phoneNumber, pas phone)
+        let client = await Client.findOne({ phoneNumber: phone }).populate('entrepriseId', 'name email')
         
         // Si pas trouvé, essayer sans le 0 initial (06... vs 6...)
         if (!client && phone.startsWith('0')) {
             const phoneWithout0 = phone.substring(1)
-            client = await Client.findOne({ phone: phoneWithout0 }).populate('entrepriseId', 'name email')
+            client = await Client.findOne({ phoneNumber: phoneWithout0 }).populate('entrepriseId', 'name email')
         }
         
         // Si pas trouvé, essayer avec le 0 initial
         if (!client && !phone.startsWith('0')) {
             const phoneWith0 = '0' + phone
-            client = await Client.findOne({ phone: phoneWith0 }).populate('entrepriseId', 'name email')
+            client = await Client.findOne({ phoneNumber: phoneWith0 }).populate('entrepriseId', 'name email')
         }
         
         if (!client) {
