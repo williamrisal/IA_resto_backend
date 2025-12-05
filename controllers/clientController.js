@@ -48,6 +48,32 @@ export const getClientById = async (req, res) => {
 }
 
 /**
+ * Récupère un client par numéro de téléphone
+ */
+export const getClientByPhone = async (req, res) => {
+    try {
+        const { phone } = req.params
+        const client = await Client.findOne({ phone }).populate('entrepriseId', 'name email')
+        if (!client) {
+            return res.status(404).json({
+                success: false,
+                message: 'Client non trouvé avec ce numéro de téléphone',
+            })
+        }
+        res.status(200).json({
+            success: true,
+            data: client,
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération du client',
+            error: error.message,
+        })
+    }
+}
+
+/**
  * Crée un nouveau client
  */
 export const createClient = async (req, res) => {

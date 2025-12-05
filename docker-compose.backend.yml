@@ -1,20 +1,4 @@
 services:
-  mongodb:
-    image: mongo:7.0
-    container_name: paneladmin_mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: SecurePassword2024!
-      MONGO_INITDB_DATABASE: resto-db
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
-    networks:
-      - paneladmin-network
-    restart: unless-stopped
-
   backend:
     build: .
     container_name: paneladmin_backend

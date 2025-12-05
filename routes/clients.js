@@ -2,6 +2,7 @@ import express from 'express'
 import {
     getAllClients,
     getClientById,
+    getClientByPhone,
     createClient,
     updateClient,
     deleteClient,
@@ -24,6 +25,9 @@ router.get('/vip', getVIPClients)
 
 // GET - Récupère les clients d'une entreprise
 router.get('/entreprise/:entrepriseId', getClientsByEntreprise)
+
+// GET - Récupère un client par numéro de téléphone
+router.get('/phone/:phone', getClientByPhone)
 
 // GET - Récupère les coordonnées d'un client (téléphone + adresse)
 router.get('/:id/coordinates', getClientCoordinates)
