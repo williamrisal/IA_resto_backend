@@ -9,13 +9,19 @@ echo "🚀 Déploiement du backend..."
 echo "📥 Git pull..."
 git pull origin main
 
+# Nettoyer les conteneurs et images orphelins
+echo "🧹 Nettoyage Docker..."
+docker-compose down 2>/dev/null || true
+docker rm -f paneladmin_backend 2>/dev/null || true
+docker system prune -f
+
 # Rebuild et redémarrer le conteneur
 echo "🔨 Rebuild de l'image Docker..."
-docker-compose up -d --build --force-recreate backend
+docker-compose up -d --build backend
 
 # Attendre que le conteneur démarre
 echo "⏳ Démarrage du conteneur..."
-sleep 3
+sleep 5
 
 # Vérifier le statut
 echo ""
