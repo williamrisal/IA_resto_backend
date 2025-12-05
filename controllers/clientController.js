@@ -52,19 +52,43 @@ export const getClientById = async (req, res) => {
  */
 export const getClientByPhone = async (req, res) => {
     try {
-        const { phone } = req.params
-        const client = await Client.findOne({ phone }).populate('entrepriseId', 'name email')
+        let { phone } = req.params
+        
+        // Nettoyer le numéro : enlever espaces, tirets, points
+        phone = phone.replace(/[\s\-\.]/g, '')
+        
+        console.log('🔍 Recherche client avec téléphone:', phone)
+        
+        // Chercher avec le numéro nettoyé
+        let client = await Client.findOne({ phone }).populate('entrepriseId', 'name email')
+        
+        // Si pas trouvé, essayer sans le 0 initial (06... vs 6...)
+        if (!client && phone.startsWith('0')) {
+            const phoneWithout0 = phone.substring(1)
+            client = await Client.findOne({ phone: phoneWithout0 }).populate('entrepriseId', 'name email')
+        }
+        
+        // Si pas trouvé, essayer avec le 0 initial
+        if (!client && !phone.startsWith('0')) {
+            const phoneWith0 = '0' + phone
+            client = await Client.findOne({ phone: phoneWith0 }).populate('entrepriseId', 'name email')
+        }
+        
         if (!client) {
+            console.log('❌ Client non trouvé avec téléphone:', phone)
             return res.status(404).json({
                 success: false,
                 message: 'Client non trouvé avec ce numéro de téléphone',
             })
         }
+        
+        console.log('✅ Client trouvé:', client._id)
         res.status(200).json({
             success: true,
             data: client,
         })
     } catch (error) {
+        console.error('❌ Erreur recherche client:', error.message)
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération du client',
