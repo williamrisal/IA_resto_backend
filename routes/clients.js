@@ -7,6 +7,7 @@ import {
     deleteClient,
     getClientsByEntreprise,
     getVIPClients,
+    getClientCoordinates,
 } from '../controllers/clientController.js'
 
 const router = express.Router()
@@ -23,6 +24,9 @@ router.get('/vip', getVIPClients)
 
 // GET - Récupère les clients d'une entreprise
 router.get('/entreprise/:entrepriseId', getClientsByEntreprise)
+
+// GET - Récupère les coordonnées d'un client (téléphone + adresse)
+router.get('/:id/coordinates', getClientCoordinates)
 
 // GET - Récupère un client par ID
 router.get('/:id', getClientById)

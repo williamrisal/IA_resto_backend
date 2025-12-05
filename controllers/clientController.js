@@ -166,3 +166,35 @@ export const getVIPClients = async (req, res) => {
         })
     }
 }
+
+/**
+ * Récupère les coordonnées d'un client (téléphone + adresse)
+ */
+export const getClientCoordinates = async (req, res) => {
+    try {
+        const client = await Client.findById(req.params.id).select('firstName lastName phone address city postalCode')
+        if (!client) {
+            return res.status(404).json({
+                success: false,
+                message: 'Client non trouvé',
+            })
+        }
+        res.status(200).json({
+            success: true,
+            data: {
+                name: `${client.firstName} ${client.lastName}`,
+                phone: client.phone,
+                address: client.address,
+                city: client.city,
+                postalCode: client.postalCode,
+                fullAddress: `${client.address}, ${client.postalCode} ${client.city}`
+            },
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération des coordonnées',
+            error: error.message,
+        })
+    }
+}

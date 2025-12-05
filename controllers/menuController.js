@@ -25,6 +25,35 @@ export const getAllMenuItems = async (req, res) => {
 }
 
 /**
+ * Récupère tous les articles du menu d'une entreprise spécifique
+ */
+export const getMenuItemsByEntreprise = async (req, res) => {
+    try {
+        const { entrepriseId } = req.query
+        
+        if (!entrepriseId) {
+            return res.status(400).json({
+                success: false,
+                message: 'L\'ID de l\'entreprise est requis',
+            })
+        }
+
+        const menuItems = await MenuItem.find({ entrepriseId }).sort({ category: 1, name: 1 })
+        res.status(200).json({
+            success: true,
+            count: menuItems.length,
+            data: menuItems,
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération du menu de l\'entreprise',
+            error: error.message,
+        })
+    }
+}
+
+/**
  * Récupère un article par ID
  */
 export const getMenuItemById = async (req, res) => {

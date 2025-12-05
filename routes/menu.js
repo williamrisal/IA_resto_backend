@@ -10,6 +10,9 @@ const router = express.Router()
 // GET - Récupère tous les articles du menu
 router.get('/', menuController.getAllMenuItems)
 
+// GET - Récupère tous les menus d'une entreprise (avec query param ?entrepriseId=xxx)
+router.get('/entreprise', menuController.getMenuItemsByEntreprise)
+
 // GET - Récupère un article par ID
 router.get('/:id', menuController.getMenuItemById)
 
