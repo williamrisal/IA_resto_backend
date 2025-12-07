@@ -58,7 +58,6 @@ export const getOrderById = async (req, res) => {
  */
 export const createOrder = async (req, res) => {
     try {
-        console.log(req)
         const { phoneNumber, entrepriseId } = req.body
 
         // Vérifier que le numéro de téléphone est fourni
