@@ -62,7 +62,7 @@ const orderSchema = new mongoose.Schema(
         // Montant total
         total: {
             type: Number,
-            required: true,
+            required: false,
             min: 0,
         },
         // Statut de la commande
