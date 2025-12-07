@@ -58,6 +58,7 @@ export const getOrderById = async (req, res) => {
  */
 export const createOrder = async (req, res) => {
     try {
+        console.log(req)
         const { phoneNumber, entrepriseId } = req.body
 
         // Vérifier que le numéro de téléphone est fourni
@@ -225,8 +226,8 @@ export const sendOrderConfirmation = async (req, res) => {
 
         // Envoyer le SMS
        // await sendConfirmationAdresseSMS(order)
-        await sendConfirmationSMS(order)
-        
+        //await sendConfirmationSMS(order)
+
         res.status(200).json({
             success: true,
             message: 'Confirmation SMS envoyée',

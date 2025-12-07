@@ -80,7 +80,7 @@ const orderSchema = new mongoose.Schema(
         // Méthode de paiement
         paymentMethod: {
             type: String,
-            enum: ['Carte', 'Espèces', 'Chèque'],
+            enum: ['Carte', 'Espèces'],
             default: 'Carte',
         },
         // Notes de la commande
