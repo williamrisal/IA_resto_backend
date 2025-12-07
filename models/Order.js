@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema(
         // ID de la commande unique
         orderId: {
             type: String,
-            required: true,
+            required: false,
         },
         // Type de commande
         type: {
@@ -34,7 +34,7 @@ const orderSchema = new mongoose.Schema(
         customer: {
             name: {
                 type: String,
-                required: true,
+                required: false,
             },
             phone: {
                 type: String,
@@ -86,7 +86,7 @@ const orderSchema = new mongoose.Schema(
         paymentMethod: {
             type: String,
             enum: ['Carte', 'Espèces', 'Chèque'],
-            default: 'Espèces',
+            default: 'Carte',
         },
         // Notes de la commande
         notes: {

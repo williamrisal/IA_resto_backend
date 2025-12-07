@@ -1,4 +1,5 @@
 import Order from '../models/Order.js'
+import Client from '../models/Client.js'
 
 /**
  * Contrôleur pour la gestion des commandes
@@ -56,12 +57,66 @@ export const getOrderById = async (req, res) => {
  */
 export const createOrder = async (req, res) => {
     try {
-        const newOrder = new Order(req.body)
+        const { phoneNumber, entrepriseId } = req.body
+
+        // Vérifier que le numéro de téléphone est fourni
+        if (!phoneNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le numéro de téléphone est requis',
+            })
+        }
+
+        // Nettoyer le numéro de téléphone (enlever espaces, tirets, etc.)
+        const cleanPhone = phoneNumber.replace(/[\s\-\.]/g, '')
+
+        // Rechercher le client par numéro de téléphone
+        const client = await Client.findOne({
+            entrepriseId: entrepriseId,
+            $or: [
+                { phoneNumber: phoneNumber },
+                { phoneNumber: cleanPhone },
+                { phoneNumber: phoneNumber.replace(/^0/, '') },
+                { phoneNumber: cleanPhone.replace(/^0/, '') },
+            ],
+        })
+
+        if (!client) {
+            return res.status(404).json({
+                success: false,
+                message: `Aucun client trouvé avec le numéro ${phoneNumber}`,
+            })
+        }
+
+        // Enrichir les données de la commande avec les infos du client
+        const orderData = {
+            ...req.body,
+            clientId: client._id,
+            customer: {
+                name: client.name,
+                phone: client.phoneNumber,
+            },
+            address: {
+                street: client.address,
+                city: client.city,
+                zipCode: client.postalCode,
+                country: 'France',
+            }
+        }
+
+        const newOrder = new Order(orderData)
         const savedOrder = await newOrder.save()
+
         res.status(201).json({
             success: true,
             message: 'Commande créée avec succès',
             data: savedOrder,
+            client: {
+                id: client._id,
+                name: client.name,
+                phone: client.phoneNumber,
+                address: client.address,
+            },
         })
     } catch (error) {
         res.status(400).json({
@@ -70,9 +125,7 @@ export const createOrder = async (req, res) => {
             error: error.message,
         })
     }
-}
-
-/**
+}/**
  * Met à jour une commande
  */
 export const updateOrder = async (req, res) => {
