@@ -19,11 +19,6 @@ const orderSchema = new mongoose.Schema(
             ref: 'Client',
             required: [true, 'L\'ID client est requis'],
         },
-        // ID de la commande unique
-        orderId: {
-            type: String,
-            required: false,
-        },
         // Type de commande
         type: {
             type: String,

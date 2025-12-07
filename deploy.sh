@@ -34,4 +34,4 @@ docker logs paneladmin_backend --tail 20
 
 echo ""
 echo "✅ Déploiement terminé!"
-echo "🔗 Test: curl http://localhost:5000/api/health"
+echo "🔗 Test: curl http://0.0.0.0:5000/api/health"

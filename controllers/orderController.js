@@ -1,5 +1,6 @@
 import Order from '../models/Order.js'
 import Client from '../models/Client.js'
+import twilio from 'twilio'
 
 /**
  * Contrôleur pour la gestion des commandes
@@ -106,7 +107,10 @@ export const createOrder = async (req, res) => {
 
         const newOrder = new Order(orderData)
         const savedOrder = await newOrder.save()
-
+        
+        // Envoyer automatiquement la confirmation SMS
+        await sendConfirmationSMS(savedOrder)
+        
         res.status(201).json({
             success: true,
             message: 'Commande créée avec succès',
@@ -198,5 +202,129 @@ export const getOrdersByStatus = async (req, res) => {
             message: 'Erreur lors de la récupération des commandes',
             error: error.message,
         })
+    }
+}
+
+/**
+ * Envoie un message de confirmation au client (route manuelle)
+ * POST /api/orders/:id/confirm
+ */
+export const sendOrderConfirmation = async (req, res) => {
+    try {
+        const orderId = req.params.id
+
+        // Récupérer la commande avec les infos du client depuis la BDD
+        const order = await Order.findById(orderId).populate('clientId')
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Commande non trouvée',
+            })
+        }
+
+        // Envoyer le SMS
+        await sendConfirmationAdresseSMS(order)
+
+        res.status(200).json({
+            success: true,
+            message: 'Confirmation SMS envoyée',
+            data: {
+                orderId: order._id,
+                customerName: order.customer.name,
+                customerPhone: order.customer.phone,
+                customerAddress: order.address,
+                customerLivraison: order.type,
+                customerPayement: order.paymentMethod
+            },
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'envoi de la confirmation',
+            error: error.message,
+        })
+    }
+}
+
+/**
+ * Fonction interne pour envoyer un SMS de confirmation
+ * Utilisée automatiquement après création de commande
+ */
+const sendConfirmationSMS = async (order) => {
+    try {
+        // Message avec l'adresse
+        const orderNum = order.orderId || order._id.toString().slice(-6)
+        const address = `${order.address.street}, ${order.address.zipCode} ${order.address.city}`
+        
+        const message = `👋 ${order.customer.name}\n\n✅ Commande n°${orderNum} enregistree !\n\n📦 ${order.type}\n📍 ${address}\n💰 ${order.total}€\n💳 ${order.paymentMethod}\n\n⏱️ Preparation: ~20 min\n\nMerci ! 🙏`
+        
+        const confirmationMessage = {
+            to: order.customer.phone,
+            message: message,
+        }
+
+        console.log('📱 Message de confirmation:', confirmationMessage)
+        console.log('📏 Longueur du message:', message.length, 'caractères')
+        console.log('🔍 Debug - customer.phone:', order.customer.phone)
+        console.log('🔍 Debug - type:', order.type)
+        console.log('🔍 Debug - total:', order.total)
+        
+        await SendSmS(confirmationMessage)
+        console.log('✅ SendSmS appelé avec succès')
+    } catch (error) {
+        console.error('❌ Erreur envoi SMS:', error.message)
+        console.error('❌ Stack:', error.stack)
+        // Ne pas bloquer la création de commande si le SMS échoue
+    }
+}
+
+
+export const SendSmS = async (messageData) => {
+    try {
+        const accountSid = 'AC595c4dab477bf49373df06196a43f77f';
+        const authToken = '22f290833263e4700f180044f7b6a517';
+        const client = twilio(accountSid, authToken);
+        
+        const message = await client.messages.create({
+            body: messageData.message,
+            from: '+15172003255',
+            to: '+33699766246' 
+        })
+        
+        console.log('✅ SMS envoyé:', message.sid)
+        return message
+    } catch (error) {
+        console.error('❌ Erreur Twilio:', error.message)
+        throw error
+    }
+}
+
+
+const sendConfirmationAdresseSMS = async (order) => {
+    try {
+        // Message avec l'adresse
+        const orderNum = order.orderId || order._id.toString().slice(-6)
+        const address = `${order.address.street}, ${order.address.zipCode} ${order.address.city}`
+        
+        const message = `👋 ${order.customer.name}\n\n✅ Commande n°${orderNum} bien enregistree !\n\n⚠️ Merci de nous confirmer votre adresse de livraison :\n📍 ${address}\n\n📦 ${order.type}\n💰 ${order.total}€\n💳 ${order.paymentMethod}\n⏱️ Preparation: ~20 min\n\nMerci ! 🙏`
+        
+        const confirmationMessage = {
+            to: order.customer.phone,
+            message: message,
+        }
+
+        console.log('📱 Message de confirmation:', confirmationMessage)
+        console.log('📏 Longueur du message:', message.length, 'caractères')
+        console.log('🔍 Debug - customer.phone:', order.customer.phone)
+        console.log('🔍 Debug - type:', order.type)
+        console.log('🔍 Debug - total:', order.total)
+        
+        await SendSmS(confirmationMessage)
+        console.log('✅ SendSmS appelé avec succès')
+    } catch (error) {
+        console.error('❌ Erreur envoi SMS:', error.message)
+        console.error('❌ Stack:', error.stack)
+        // Ne pas bloquer la création de commande si le SMS échoue
     }
 }

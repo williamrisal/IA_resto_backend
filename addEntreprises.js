@@ -149,7 +149,7 @@ async function addEntreprises() {
     try {
         console.log('📡 Envoi des 2 nouvelles entreprises à l\'API...\n')
 
-        const response = await fetch('http://localhost:5000/api/seed/multiple', {
+        const response = await fetch('http://0.0.0.0:5000/api/seed/multiple', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -179,7 +179,7 @@ async function addEntreprises() {
         }
     } catch (error) {
         console.error('❌ Erreur de connexion:', error.message)
-        console.log('\n⚠️  Assurez-vous que le serveur est lancé sur http://localhost:5000')
+        console.log('\n⚠️  Assurez-vous que le serveur est lancé sur http://0.0.0.0:5000')
         console.log('Commande: npm run dev')
     }
 }

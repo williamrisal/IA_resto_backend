@@ -20,7 +20,7 @@ const app = express()
 
 // Middleware
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:8080',
+    origin: process.env.CLIENT_URL || 'http://0.0.0.0:8080',
     credentials: true,
 }))
 app.use(express.json())
@@ -65,9 +65,10 @@ app.use((req, res) => {
  * Démarrage du serveur
  */
 const PORT = process.env.PORT || 5000
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Serveur lancé sur http://0.0.0.0:${PORT}`)
-    console.log(`📊 Dashboard: http://localhost:8080`)
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '0.0.0.0'
+app.listen(PORT, HOST, () => {
+    console.log(`🚀 Serveur lancé sur http://${HOST}:${PORT}`)
+    console.log(`📊 Dashboard: http://0.0.0.0:8080`)
 })
 
 export default app

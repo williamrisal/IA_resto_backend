@@ -15,7 +15,7 @@ dotenv.config()
 
 // Données des clients directement dans le script
 const clientsData = [
-    { orderNumber: '1001', phoneNumber: '06 12 34 56 78', name: 'Jean Dupont', address: '123 Rue de Paris', city: 'Paris', postalCode: '75001', houseNumber: '123', apartment: '', deliveryNotes: 'Appeler à l\'arrivée', status: 'Actif', orderCount: 5, totalSpent: 145.50 },
+    { orderNumber: '1001', phoneNumber: '06 12 34 56 78', name: 'Jean Dupont', address: '123 Rue de Paris', city: 'Paris', postalCode: '75000', houseNumber: '123', apartment: '', deliveryNotes: 'Appeler à l\'arrivée', status: 'Actif', orderCount: 5, totalSpent: 145.50 },
     { orderNumber: '1002', phoneNumber: '06 23 45 67 89', name: 'Marie Martin', address: '456 Avenue Victor Hugo', city: 'Lyon', postalCode: '69000', houseNumber: '456', apartment: 'Apt 3B', deliveryNotes: 'Laisser au portail', status: 'Actif', orderCount: 12, totalSpent: 380.25 },
     { orderNumber: '1003', phoneNumber: '06 34 56 78 90', name: 'Pierre Bernard', address: '789 Boulevard Saint-Germain', city: 'Paris', postalCode: '75005', houseNumber: '789', apartment: '', deliveryNotes: 'Pas de sonnette', status: 'Actif', orderCount: 3, totalSpent: 92.00 },
     { orderNumber: '1004', phoneNumber: '06 45 67 89 01', name: 'Sophie Laurent', address: '321 Rue de Rivoli', city: 'Marseille', postalCode: '13000', houseNumber: '321', apartment: 'Rez-de-chaussée', deliveryNotes: 'Laisser devant la porte', status: 'Inactif', orderCount: 8, totalSpent: 267.80 },
@@ -49,7 +49,7 @@ async function seedDatabase() {
             phone: '01 23 45 67 89',
             address: '123 Rue de Paris',
             city: 'Paris',
-            postalCode: '75001',
+            postalCode: '75000',
             country: 'France',
             currency: 'EUR',
             timezone: 'Europe/Paris',

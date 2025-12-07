@@ -23,7 +23,7 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/resto-db?retryWr
 
 #### Option B : MongoDB Locale
 ```bash
-MONGODB_URI=mongodb://localhost:27017/resto-db
+MONGODB_URI=mongodb://0.0.0.0:27017/resto-db
 ```
 
 ### 3. Lancer le serveur
@@ -38,7 +38,7 @@ npm run dev
 npm start
 ```
 
-Le serveur démarre sur `http://localhost:5000`
+Le serveur démarre sur `http://0.0.0.0:5000`
 
 ## 📚 API Endpoints
 
@@ -89,14 +89,14 @@ Créer un fichier `.env`:
 MONGODB_URI=votre_url_mongodb
 PORT=5000
 NODE_ENV=development
-CLIENT_URL=http://localhost:8080
+CLIENT_URL=http://0.0.0.0:8080
 ```
 
 ## 📝 Exemple d'utilisation avec cURL
 
 ### Créer une commande
 ```bash
-curl -X POST http://localhost:5000/api/orders \
+curl -X POST http://0.0.0.0:5000/api/orders \
   -H "Content-Type: application/json" \
   -d '{
     "orderId": "CMD-001",
@@ -119,14 +119,14 @@ curl -X POST http://localhost:5000/api/orders \
 
 ### Récupérer tous les articles du menu
 ```bash
-curl http://localhost:5000/api/menu
+curl http://0.0.0.0:5000/api/menu
 ```
 
 ## 🔗 Connecter le frontend
 
 Ajouter l'URL du backend dans votre `.env` du frontend:
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://0.0.0.0:5000
 ```
 
 Puis utiliser dans React:
