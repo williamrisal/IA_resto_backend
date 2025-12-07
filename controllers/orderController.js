@@ -224,8 +224,9 @@ export const sendOrderConfirmation = async (req, res) => {
         }
 
         // Envoyer le SMS
-        await sendConfirmationAdresseSMS(order)
-
+       // await sendConfirmationAdresseSMS(order)
+        await sendConfirmationSMS(order)
+        
         res.status(200).json({
             success: true,
             message: 'Confirmation SMS envoyée',
