@@ -1,5 +1,6 @@
 import express from 'express'
 import * as orderController from '../controllers/orderController.js'
+import parseFormData from '../middleware/formDataParser.js'
 
 const router = express.Router()
 
@@ -16,8 +17,8 @@ router.get('/:id', orderController.getOrderById)
 // GET - Récupère les commandes par statut
 router.get('/status/:status', orderController.getOrdersByStatus)
 
-// POST - Crée une nouvelle commande
-router.post('/', orderController.createOrder)
+// POST - Crée une nouvelle commande (accepte JSON et form-data)
+router.post('/', parseFormData, orderController.createOrder)
 
 // POST - Envoie un message de confirmation au client
 router.post('/:id/confirm', orderController.sendOrderConfirmation)

@@ -24,22 +24,6 @@ app.use(cors({
     credentials: true,
 }))
 
-// Middleware pour capturer le body RAW AVANT le parsing JSON
-app.use((req, res, next) => {
-    let data = ''
-    req.on('data', chunk => {
-        data += chunk
-    })
-    req.on('end', () => {
-        if (data && (req.method === 'POST' || req.method === 'PUT')) {
-            console.log('🔍 RAW BODY:', data)
-            console.log('📍 Position 150:', data.substring(145, 155))
-            console.log('📍 Position 162:', data.substring(157, 167))
-        }
-        next()
-    })
-})
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 

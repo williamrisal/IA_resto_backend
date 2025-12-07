@@ -67,7 +67,7 @@ export const createOrder = async (req, res) => {
                 message: 'Le numéro de téléphone est requis',
             })
         }
-        print(phoneNumber)
+        console.log('📞 Numéro de téléphone reçu:', phoneNumber)
 
         // Nettoyer le numéro de téléphone (enlever espaces, tirets, etc.)
         const cleanPhone = phoneNumber.replace(/[\s\-\.]/g, '')
