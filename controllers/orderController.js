@@ -285,7 +285,7 @@ const sendConfirmationSMS = async (order) => {
 export const SendSmS = async (messageData) => {
     try {
         const accountSid = 'AC595c4dab477bf49373df06196a43f77f';
-        const authToken = '22f290833263e4700f180044f7b6a517';
+        const authToken = 'a274289866551edc13826306dfe90c09';
         const client = twilio(accountSid, authToken);
         
         const message = await client.messages.create({
