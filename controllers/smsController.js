@@ -1,6 +1,7 @@
 import twilio from 'twilio'
 import Order from '../models/Order.js'
 import Client from '../models/Client.js'
+import SMSConversation from '../models/SMSConversation.js'
 
 /**
  * Contrôleur pour la gestion des SMS entrants et sortants via Twilio
@@ -49,23 +50,26 @@ export const receiveSMS = async (req, res) => {
         console.log('✅ Client trouvé:', client.name)
         console.log('📝 Sauvegarde du message...')
 
-        // Analyser le contenu du message
-        const messageContent = Body.toLowerCase().trim()
-        
-        let response = ''
-        console.log(messageContent)
-        // Détection de mots-clés
-        if (messageContent.includes('oui') || messageContent.includes('ok') || messageContent.includes('confirme')) {
-            response = `Merci ${client.name} ! Votre commande est confirmée. 🎉`
-        } else if (messageContent.includes('non') || messageContent.includes('annule')) {
-            response = `Message reçu ${client.name}. Nous allons vous recontacter. 📞`
-        } else if (messageContent.includes('aide') || messageContent.includes('help')) {
-            response = 'Répondez OUI pour confirmer ou NON pour annuler. Pour toute question, appelez-nous ! 📞'
+        // Récupérer la dernière commande du client
+        const lastOrder = await Order.findOne({ clientId: client._id })
+            .sort({ createdAt: -1 })
+            .populate('items.menuItemId')
+
+        if (lastOrder) {
+            console.log('📦 Dernière commande trouvée:', lastOrder._id)
+
+            if (lastOrder.status === 'En attente') {
+                response = `Bonjour ${client.name}, nous avons bien reçu votre message concernant la commande #${lastOrder._id}. votre adresse de livraison a été mise à jour. Merci !`
+                // Mettre à jour l'adresse de livraison si le message contient une adresse
+                lastOrder.deliveryAddress = Body.toLowerCase().trim()
+                await lastOrder.save()
+                console.log('✅ Adresse de livraison mise à jour pour la commande', lastOrder._id)
+            }
+
         } else {
-            response = `Message reçu ${client.name} ! Nous vous répondrons rapidement. Merci ! 🙏`
+            console.log('⚠️ Aucune commande trouvée pour ce client')
         }
 
-        // Répondre avec TwiML
         const twiml = new twilio.twiml.MessagingResponse()
         twiml.message(response)
         

@@ -207,6 +207,65 @@ export const getOrdersByStatus = async (req, res) => {
 }
 
 /**
+ * Récupère la dernière commande d'un client par son ID
+ * GET /api/orders/client/:clientId/last
+ */
+export const getLastOrderByClientId = async (req, res) => {
+    try {
+        const { clientId } = req.params
+
+        // Récupérer la dernière commande du client (la plus récente)
+        const lastOrder = await Order.findOne({ clientId })
+            .sort({ createdAt: -1 })
+            .populate('items.menuItemId')
+
+        if (!lastOrder) {
+            return res.status(404).json({
+                success: false,
+                message: 'Aucune commande trouvée pour ce client',
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            data: lastOrder,
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération de la dernière commande',
+            error: error.message,
+        })
+    }
+}
+
+/**
+ * Récupère toutes les commandes d'un client par son ID
+ * GET /api/orders/client/:clientId
+ */
+export const getOrdersByClientId = async (req, res) => {
+    try {
+        const { clientId } = req.params
+
+        const orders = await Order.find({ clientId })
+            .sort({ createdAt: -1 })
+            .populate('items.menuItemId')
+
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            data: orders,
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération des commandes du client',
+            error: error.message,
+        })
+    }
+}
+
+/**
  * Envoie un message de confirmation au client (route manuelle)
  * POST /api/orders/:id/confirm
  */
@@ -305,28 +364,20 @@ export const SendSmS = async (messageData) => {
 
 const sendConfirmationAdresseSMS = async (order) => {
     try {
-        // Message avec l'adresse
-        const orderNum = order.orderId || order._id.toString().slice(-6)
-        const address = `${order.address.street}, ${order.address.zipCode} ${order.address.city}`
+        const accountSid = 'AC595c4dab477bf49373df06196a43f77f';
+        const authToken = 'a274289866551edc13826306dfe90c09';
+        const client = twilio(accountSid, authToken);
         
-        const message = `👋 ${order.customer.name}\n\n✅ Commande n°${orderNum} bien enregistree !\n\n⚠️ Merci de nous confirmer votre adresse de livraison :\n📍 ${address}\n\n📦 ${order.type}\n💰 ${order.total}€\n💳 ${order.paymentMethod}\n⏱️ Preparation: ~20 min\n\nMerci ! 🙏`
+        const message = await client.messages.create({
+            body: messageData.message,
+            from: '+33939036568',
+            to: '+33699766246' 
+        })
         
-        const confirmationMessage = {
-            to: order.customer.phone,
-            message: message,
-        }
-
-        console.log('📱 Message de confirmation:', confirmationMessage)
-        console.log('📏 Longueur du message:', message.length, 'caractères')
-        console.log('🔍 Debug - customer.phone:', order.customer.phone)
-        console.log('🔍 Debug - type:', order.type)
-        console.log('🔍 Debug - total:', order.total)
-        
-        await SendSmS(confirmationMessage)
-        console.log('✅ SendSmS appelé avec succès')
+        console.log('✅ SMS envoyé:', message.sid)
+        return message
     } catch (error) {
-        console.error('❌ Erreur envoi SMS:', error.message)
-        console.error('❌ Stack:', error.stack)
-        // Ne pas bloquer la création de commande si le SMS échoue
+        console.error('❌ Erreur Twilio:', error.message)
+        throw error
     }
 }

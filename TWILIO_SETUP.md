@@ -28,7 +28,39 @@ Body: {
 }
 ```
 
-#### 4. Vérifier le statut d'un SMS
+#### 4. Demander l'adresse de livraison (NOUVEAU ✨)
+```
+POST /api/sms/request-address
+Body: {
+  "phoneNumber": "0699766246",
+  "orderId": "optional_order_id"
+}
+```
+
+**Exemple de requête :**
+```bash
+curl -X POST http://localhost:5000/api/sms/request-address \
+  -H "Content-Type: application/json" \
+  -d '{
+    "phoneNumber": "0699766246",
+    "orderId": "65abc123def456..."
+  }'
+```
+
+**Le client recevra :**
+```
+👋 Jean Dupont
+
+Pour votre commande n°123456 (35.50€)
+
+📍 Votre adresse actuelle:
+12 rue de la Paix, 75001 Paris
+
+✅ Répondez OUI pour confirmer
+❌ Ou envoyez-nous votre nouvelle adresse complète
+```
+
+#### 5. Vérifier le statut d'un SMS
 ```
 GET /api/sms/status/:messageSid
 ```
@@ -87,10 +119,82 @@ Votre URL webhook sera : `https://votre-domaine.com/api/sms/webhook`
 
 ### Messages automatiques implémentés :
 
-- Si le client envoie "OUI" → Confirmation de commande
-- Si le client envoie "NON" → Message d'annulation
-- Si le client envoie "AIDE" → Instructions
-- Autre message → Accusé de réception
+Le système détecte automatiquement la dernière commande du client et répond intelligemment :
+
+- **"OUI"** / **"OK"** / **"CONFIRME"** → Confirmation de commande + mise à jour du statut
+- **"NON"** / **"ANNULE"** → Annulation de la commande
+- **"AIDE"** / **"HELP"** → Menu d'aide avec toutes les options
+- **"ADRESSE"** → Affiche l'adresse actuelle de livraison
+- **"STATUT"** / **"COMMANDE"** → Affiche le statut de la dernière commande
+- **Adresse complète** (ex: "12 rue de la Paix 75001 Paris") → Met à jour l'adresse de la commande
+- **Autre message** → Accusé de réception générique
+
+### Workflow complet - Demande d'adresse :
+
+#### 1. Vous demandez l'adresse au client via l'API :
+```bash
+curl -X POST http://localhost:5000/api/sms/request-address \
+  -H "Content-Type: application/json" \
+  -d '{"phoneNumber": "0699766246"}'
+```
+
+#### 2. Le client reçoit :
+```
+👋 Jean Dupont
+
+Pour votre commande n°123456 (35.50€)
+
+📍 Votre adresse actuelle:
+12 rue de la Paix, 75001 Paris
+
+✅ Répondez OUI pour confirmer
+❌ Ou envoyez-nous votre nouvelle adresse complète
+```
+
+#### 3. Le client répond de plusieurs façons possibles :
+
+**Option A - Confirme l'adresse :**
+```
+Client: "OUI"
+```
+```
+Bot: Merci Jean Dupont ! Votre commande n°123456 est confirmée 🎉
+
+📍 12 rue de la Paix, 75001 Paris
+💰 35.5€
+⏱️ Livraison: 30-45 min
+
+Bon appétit ! 🍽️
+```
+
+**Option B - Envoie une nouvelle adresse :**
+```
+Client: "25 avenue des Champs-Élysées 75008 Paris"
+```
+```
+Bot: Merci Jean Dupont ! Votre adresse a été mise à jour :
+📍 25 avenue des Champs-Élysées 75008 Paris
+
+Commande n°123456
+💰 35.5€
+⏱️ Livraison estimée: 30-45 min
+
+Bon appétit ! 🍽️
+```
+
+**Option C - Demande le statut :**
+```
+Client: "STATUT"
+```
+```
+Bot: ✅ Commande n°123456
+
+Statut: confirmed
+Total: 35.5€
+Type: livraison
+
+Merci pour votre commande ! 🙏
+```
 
 ## 📝 Variables d'environnement nécessaires
 

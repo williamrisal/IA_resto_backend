@@ -11,6 +11,12 @@ const router = express.Router()
 // GET - Récupère toutes les commandes
 router.get('/', orderController.getAllOrders)
 
+// GET - Récupère la dernière commande d'un client
+router.get('/client/:clientId/last', orderController.getLastOrderByClientId)
+
+// GET - Récupère toutes les commandes d'un client
+router.get('/client/:clientId', orderController.getOrdersByClientId)
+
 // GET - Récupère une commande par ID
 router.get('/:id', orderController.getOrderById)
 
