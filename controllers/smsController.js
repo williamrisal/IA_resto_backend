@@ -94,7 +94,7 @@ export const receiveSMS = async (req, res) => {
 
         let response = 'Merci pour votre message. Nous reviendrons vers vous sous peu.'
         
-        if (true) { //HARDCODED FOR TESTING
+        if (lastOrder) {
             console.log('📦 Dernière commande trouvée:', lastOrder._id)
 
             if (lastOrder.status === 'En attente') {
