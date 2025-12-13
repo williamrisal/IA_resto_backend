@@ -1,6 +1,6 @@
 import Order from '../models/Order.js'
 import Client from '../models/Client.js'
-import { sendConfirmationSMS } from '../controllers/smsController.js'
+import { sendConfirmationSMS, SendSmS } from '../controllers/smsController.js'
 import twilio from 'twilio'
 
 /**
@@ -112,10 +112,10 @@ export const createOrder = async (req, res) => {
         
         // Envoyer automatiquement la confirmation SMS
         if (!client.address) {
-            await sms.sendConfirmationAdresseSMS(savedOrder)
+            await sendConfirmationSMS(savedOrder)
         }
         else {
-            await sms.SendSmS(savedOrder)
+            await SendSmS(savedOrder)
         }
         
         res.status(201).json({
@@ -270,51 +270,3 @@ export const getOrdersByClientId = async (req, res) => {
         })
     }
 }
-
-/**
- * Envoie un message de confirmation au client (route manuelle)
- * POST /api/orders/:id/confirm
- */
-export const sendOrderConfirmation = async (req, res) => {
-    try {
-        const orderId = req.params.id
-
-        // Récupérer la commande avec les infos du client depuis la BDD
-        const order = await Order.findById(orderId).populate('clientId')
-
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Commande non trouvée',
-            })
-        }
-
-        // Envoyer le SMS
-       // await sendConfirmationAdresseSMS(order)
-        //await sendConfirmationSMS(order)
-
-        res.status(200).json({
-            success: true,
-            message: 'Confirmation SMS envoyée',
-            data: {
-                orderId: order._id,
-                customerName: order.customer.name,
-                customerPhone: order.customer.phone,
-                customerAddress: order.address,
-                customerLivraison: order.type,
-                customerPayement: order.paymentMethod
-            },
-        })
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Erreur lors de l\'envoi de la confirmation',
-            error: error.message,
-        })
-    }
-}
-
-/**
- * Fonction interne pour envoyer un SMS de confirmation
- * Utilisée automatiquement après création de commande
- */
