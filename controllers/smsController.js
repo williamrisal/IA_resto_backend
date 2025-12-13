@@ -8,6 +8,43 @@ import { response } from 'express'
  */
 
 /**
+ * Fonction pour parser une adresse complète et extraire les composants
+ * Exemple: "12 rue de la Paix 75001 Paris" -> { street: "12 rue de la Paix", zipCode: "75001", city: "Paris" }
+ */
+function parseAddress(addressText) {
+    const text = addressText.trim()
+    
+    // Regex pour trouver le code postal (5 chiffres)
+    const zipCodeMatch = text.match(/\b(\d{5})\b/)
+    
+    if (zipCodeMatch) {
+        const zipCode = zipCodeMatch[1]
+        const zipCodeIndex = text.indexOf(zipCode)
+        
+        // Tout avant le code postal = rue
+        const street = text.substring(0, zipCodeIndex).trim()
+        
+        // Tout après le code postal = ville
+        const city = text.substring(zipCodeIndex + 5).trim()
+        
+        return {
+            street: street,
+            zipCode: zipCode,
+            city: city,
+            country: 'France'
+        }
+    }
+    
+    // Si pas de code postal trouvé, on met tout dans street
+    return {
+        street: text,
+        zipCode: '',
+        city: '',
+        country: 'France'
+    }
+}
+
+/**
  * Webhook pour recevoir les SMS entrants de Twilio
  * POST /api/sms/webhook
  */
@@ -57,19 +94,42 @@ export const receiveSMS = async (req, res) => {
 
         let response = 'Merci pour votre message. Nous reviendrons vers vous sous peu.'
         
-        if (true) { // HARD-CODED TRUE FOR TESTING
+        if (true) { //HARDCODED FOR TESTING
             console.log('📦 Dernière commande trouvée:', lastOrder._id)
 
             if (lastOrder.status === 'En attente') {
-                response = `Bonjour ${client.name}, nous avons bien reçu votre message concernant la commande #${lastOrder._id}. votre adresse de livraison a été mise à jour. Merci !`
-                // Mettre à jour l'adresse de livraison si le message contient une adresse
-                lastOrder.deliveryAddress = Body.toLowerCase().trim()
-                await lastOrder.save()
-                console.log('✅ Adresse de livraison mise à jour pour la commande', lastOrder._id)
+                // Détecter si c'est une adresse (contient des chiffres)
+                const isAddress = /\d+/.test(Body)
+                
+                if (isAddress) {
+                    // Parser l'adresse
+                    const parsedAddress = parseAddress(Body)
+                    
+                    console.log('📍 Adresse parsée:', parsedAddress)
+                    
+                    // Mettre à jour l'adresse dans la commande
+                    lastOrder.address = {
+                        street: parsedAddress.street,
+                        zipCode: parsedAddress.zipCode,
+                        city: parsedAddress.city,
+                        country: parsedAddress.country
+                    }
+                    
+                    await lastOrder.save()
+                    console.log('✅ Adresse de livraison mise à jour pour la commande', lastOrder._id)
+                    
+                    const orderNum = lastOrder.orderId || lastOrder._id.toString().slice(-6)
+                    response = `Merci ${client.name} ! Votre adresse a été mise à jour :\n📍 ${parsedAddress.street}\n${parsedAddress.zipCode} ${parsedAddress.city}\n\nCommande n°${orderNum}\n💰 ${lastOrder.total}€\n\nNous préparons votre commande ! 🍽️`
+                } else {
+                    response = `Merci ${client.name} ! Envoyez-nous votre adresse complète (ex: 12 rue de la Paix 75001 Paris)`
+                }
+            } else {
+                response = `Bonjour ${client.name} ! Votre commande est déjà ${lastOrder.status}. Merci ! 🙏`
             }
 
         } else {
             console.log('⚠️ Aucune commande trouvée pour ce client')
+            response = `Bonjour ${client.name} ! Aucune commande en attente trouvée.`
         }
 
         const twiml = new twilio.twiml.MessagingResponse()
