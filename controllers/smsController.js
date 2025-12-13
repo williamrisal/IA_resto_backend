@@ -107,19 +107,37 @@ export const receiveSMS = async (req, res) => {
                     
                     console.log('📍 Adresse parsée:', parsedAddress)
                     
-                    // Mettre à jour l'adresse dans la commande
-                    lastOrder.address = {
-                        street: parsedAddress.street,
-                        zipCode: parsedAddress.zipCode,
-                        city: parsedAddress.city,
-                        country: parsedAddress.country
+                    // Mettre à jour l'adresse dans la commande (seulement les champs non vides)
+                    if (parsedAddress.street) {
+                        lastOrder.address.street = parsedAddress.street
+                    }
+                    if (parsedAddress.zipCode) {
+                        lastOrder.address.zipCode = parsedAddress.zipCode
+                    }
+                    if (parsedAddress.city) {
+                        lastOrder.address.city = parsedAddress.city
+                    }
+                    if (parsedAddress.country) {
+                        lastOrder.address.country = parsedAddress.country
                     }
                     
+                    // Mettre à jour le statut à "En cours" quand l'adresse est confirmée
+                    lastOrder.status = 'En cours'
+                    
                     await lastOrder.save()
+                    await Client.findByIdAndUpdate(client._id, { address: lastOrder.address })
+                    
                     console.log('✅ Adresse de livraison mise à jour pour la commande', lastOrder._id)
+                    console.log('✅ Statut mis à jour: En cours')
                     
                     const orderNum = lastOrder.orderId || lastOrder._id.toString().slice(-6)
-                    response = `Merci ${client.name} ! Votre adresse a été mise à jour :\n📍 ${parsedAddress.street}\n${parsedAddress.zipCode} ${parsedAddress.city}\n\nCommande n°${orderNum}\n💰 ${lastOrder.total}€\n\nNous préparons votre commande ! 🍽️`
+
+                    if (!lastOrder.address.zipCode && !lastOrder.address.city) {
+                        response = `Merci ${client.name} ! Votre adresse a été partiellement mise à jour :\n📍 ${lastOrder.address.street}, veuillez préciser la ville  et/ou le  code postal.`
+                    }
+                    else {
+                        response = `Merci ${client.name} ! Votre adresse a été mise à jour :\n📍 ${parsedAddress.street}\n${parsedAddress.zipCode} ${parsedAddress.city}\n\nCommande n°${orderNum}\n💰 ${lastOrder.total}€\n\nNous préparons votre commande ! 🍽️`
+                    }
                 } else {
                     response = `Merci ${client.name} ! Envoyez-nous votre adresse complète (ex: 12 rue de la Paix 75001 Paris)`
                 }
@@ -210,53 +228,26 @@ export const getSMSHistory = async (req, res) => {
  * Envoie un SMS manuel à un client
  * POST /api/sms/send
  */
-export const sendSMS = async (req, res) => {
+export const SendSmS = async (messageData) => {
     try {
-        const { to, message } = req.body
-
-        if (!to || !message) {
-            return res.status(400).json({
-                success: false,
-                message: 'Le numéro de téléphone et le message sont requis',
-            })
-        }
-
-        const accountSid = process.env.TWILIO_ACCOUNT_SID
-        const authToken = process.env.TWILIO_AUTH_TOKEN
-        const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER
-
-        if (!accountSid || !authToken || !twilioPhoneNumber) {
-            return res.status(500).json({
-                success: false,
-                message: 'Identifiants Twilio non configurés',
-            })
-        }
-
-        const client = twilio(accountSid, authToken)
-
-        const sentMessage = await client.messages.create({
-            body: message,
-            from: twilioPhoneNumber,
-            to: to,
+        const accountSid = 'AC595c4dab477bf49373df06196a43f77f';
+        const authToken = 'a274289866551edc13826306dfe90c09';
+        const client = twilio(accountSid, authToken);
+        
+        const message = await client.messages.create({
+            body: messageData.message,
+            from: '+33939036568',
+            to: '+33699766246' 
         })
-
-        res.status(200).json({
-            success: true,
-            message: 'SMS envoyé avec succès',
-            data: {
-                sid: sentMessage.sid,
-                to: sentMessage.to,
-                status: sentMessage.status,
-            },
-        })
+        
+        console.log('✅ SMS envoyé:', message.sid)
+        return message
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Erreur lors de l\'envoi du SMS',
-            error: error.message,
-        })
+        console.error('❌ Erreur Twilio:', error.message)
+        throw error
     }
 }
+
 
 /**
  * Vérifie le statut d'un SMS envoyé
@@ -297,5 +288,34 @@ export const getSMSStatus = async (req, res) => {
             message: 'Erreur lors de la récupération du statut SMS',
             error: error.message,
         })
+    }
+}
+
+
+export const sendConfirmationSMS = async (order) => {
+    try {
+        // Message avec l'adresse
+        const orderNum = order.orderId || order._id.toString().slice(-6)
+        const address = `${order.address.street}, ${order.address.zipCode} ${order.address.city}`
+        
+        const message = `👋 ${order.customer.name}\n\n✅ Commande n°${orderNum} enregistree !\n\n📦 ${order.type}\n📍 ${address}\n💰 ${order.total}€\n💳 ${order.paymentMethod}\n\n⏱️ Preparation: ~20 min\n\nMerci ! 🙏`
+        
+        const confirmationMessage = {
+            to: order.customer.phone,
+            message: message,
+        }
+
+        console.log('📱 Message de confirmation:', confirmationMessage)
+        console.log('📏 Longueur du message:', message.length, 'caractères')
+        console.log('🔍 Debug - customer.phone:', order.customer.phone)
+        console.log('🔍 Debug - type:', order.type)
+        console.log('🔍 Debug - total:', order.total)
+        
+        await SendSmS(confirmationMessage)
+        console.log('✅ SendSmS appelé avec succès')
+    } catch (error) {
+        console.error('❌ Erreur envoi SMS:', error.message)
+        console.error('❌ Stack:', error.stack)
+        // Ne pas bloquer la création de commande si le SMS échoue
     }
 }
