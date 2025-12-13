@@ -26,9 +26,6 @@ router.get('/status/:status', orderController.getOrdersByStatus)
 // POST - Crée une nouvelle commande (accepte JSON et form-data)
 router.post('/', parseFormData, orderController.createOrder)
 
-// POST - Envoie un message de confirmation au client
-router.post('/:id/confirm', orderController.sendOrderConfirmation)
-
 // PUT - Met à jour une commande
 router.put('/:id', orderController.updateOrder)
 
