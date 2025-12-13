@@ -55,7 +55,7 @@ export const receiveSMS = async (req, res) => {
             .sort({ createdAt: -1 })
             .populate('items.menuItemId')
 
-        response = 'Merci pour votre message. Nous reviendrons vers vous sous peu.'
+        let response = 'Merci pour votre message. Nous reviendrons vers vous sous peu.'
         
         if (true) { // HARD-CODED TRUE FOR TESTING
             console.log('📦 Dernière commande trouvée:', lastOrder._id)
