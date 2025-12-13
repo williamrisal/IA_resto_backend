@@ -1,6 +1,7 @@
 import twilio from 'twilio'
 import Order from '../models/Order.js'
 import Client from '../models/Client.js'
+import { response } from 'express'
 
 /**
  * Contrôleur pour la gestion des SMS entrants et sortants via Twilio
@@ -54,7 +55,9 @@ export const receiveSMS = async (req, res) => {
             .sort({ createdAt: -1 })
             .populate('items.menuItemId')
 
-        if (lastOrder) {
+        response = 'Merci pour votre message. Nous reviendrons vers vous sous peu.'
+        
+        if (true) { // HARD-CODED TRUE FOR TESTING
             console.log('📦 Dernière commande trouvée:', lastOrder._id)
 
             if (lastOrder.status === 'En attente') {
