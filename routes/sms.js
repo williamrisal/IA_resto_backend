@@ -2,7 +2,7 @@ import express from 'express'
 import {
     receiveSMS,
     getSMSHistory,
-    sendSMS,
+    SendSmS,
     getSMSStatus,
 } from '../controllers/smsController.js'
 
@@ -27,7 +27,7 @@ router.get('/history/:phoneNumber', getSMSHistory)
  * @desc    Envoie un SMS manuel
  * @access  Private (nécessite auth - à ajouter)
  */
-router.post('/send', sendSMS)
+router.post('/send', SendSmS)
 
 /**
  * @route   GET /api/sms/status/:messageSid

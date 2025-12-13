@@ -1,6 +1,6 @@
 import Order from '../models/Order.js'
 import Client from '../models/Client.js'
-import sms from '../controllers/smsController.js'
+import { sendConfirmationSMS } from '../controllers/smsController.js'
 import twilio from 'twilio'
 
 /**
