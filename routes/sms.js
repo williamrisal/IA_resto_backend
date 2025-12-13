@@ -4,7 +4,6 @@ import {
     getSMSHistory,
     sendSMS,
     getSMSStatus,
-    requestAddress,
 } from '../controllers/smsController.js'
 
 const router = express.Router()
