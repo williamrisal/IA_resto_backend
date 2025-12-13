@@ -8,6 +8,7 @@ import entrepriseRoutes from './routes/entreprises.js'
 import clientRoutes from './routes/clients.js'
 import seedRoutes from './routes/seed.js'
 import authRoutes from './routes/auth.js'
+import smsRoutes from './routes/sms.js'
 
 // Chargement des variables d'environnement
 dotenv.config()
@@ -39,6 +40,7 @@ app.use('/api/menu', menuRoutes)
 app.use('/api/entreprises', entrepriseRoutes)
 app.use('/api/clients', clientRoutes)
 app.use('/api/seed', seedRoutes)
+app.use('/api/sms', smsRoutes)
 
 /**
  * Route de santé - Vérifie si le serveur est opérationnel
