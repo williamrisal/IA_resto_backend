@@ -125,7 +125,13 @@ export const receiveSMS = async (req, res) => {
                     lastOrder.status = 'En cours'
                     
                     await lastOrder.save()
-                    await Client.findByIdAndUpdate(client._id, { address: lastOrder.address })
+                    
+                    // Mettre à jour le client avec les champs séparés (pas un objet address)
+                    await Client.findByIdAndUpdate(client._id, { 
+                        address: parsedAddress.street,
+                        city: parsedAddress.city,
+                        postalCode: parsedAddress.zipCode
+                    })
                     
                     console.log('✅ Adresse de livraison mise à jour pour la commande', lastOrder._id)
                     console.log('✅ Statut mis à jour: En cours')
