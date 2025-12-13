@@ -1,7 +1,6 @@
 import twilio from 'twilio'
 import Order from '../models/Order.js'
 import Client from '../models/Client.js'
-import SMSConversation from '../models/SMSConversation.js'
 
 /**
  * Contrôleur pour la gestion des SMS entrants et sortants via Twilio
