@@ -1,41 +1,44 @@
-#!/bin/bash
+version: '3.8'
 
-# Script de déploiement optimisé pour Amazon Linux 2023
-# Fichier de config : docker-compose.backend.yml
+services:
+  # LE SERVICE MANQUANT ÉTAIT ICI :
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=SecurePassword2024!
+      - MONGO_INITDB_DATABASE=resto-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    networks:
+      - paneladmin-network
 
-echo "🚀 Déploiement du backend..."
+  backend:
+    build: .
+    container_name: paneladmin_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:SecurePassword2024!@mongodb:27017/resto-db?authSource=admin
+      - PORT=5000
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-12345
+      - CLIENT_URL=http://myrestoia.s3-website.eu-north-1.amazonaws.com
+    depends_on:
+      - mongodb
+    networks:
+      - paneladmin-network
+    restart: unless-stopped
 
-# 1. Récupérer les dernières modifications
-echo "📥 Git pull..."
-git pull origin main
+volumes:
+  mongo_data:
+  mongo_config:
 
-# 2. Définir la commande de base (pour éviter les répétitions et gérer le fichier spécifique)
-# On utilise 'docker compose' (espace) qui est le standard AL2023
-DOCKER_CMD="docker compose -f docker-compose.backend.yml"
-
-# 3. Nettoyer proprement
-echo "🧹 Nettoyage Docker..."
-$DOCKER_CMD down --remove-orphans 2>/dev/null || true
-docker system prune -f
-
-# 4. Rebuild et redémarrer
-# Note : on utilise 'up --build' pour tout faire en une étape
-echo "🔨 Rebuild et démarrage de l'image Docker..."
-$DOCKER_CMD up -d --build
-
-# 5. Attendre que le conteneur démarre
-echo "⏳ Démarrage du conteneur en cours..."
-sleep 5
-
-# 6. Vérifier le statut
-echo ""
-echo "📊 Statut des conteneurs:"
-$DOCKER_CMD ps
-
-echo ""
-echo "📋 Derniers logs (5 dernières lignes):"
-$DOCKER_CMD logs --tail 5
-
-echo ""
-echo "✅ Déploiement terminé!"
-echo "🔗 Test local: curl http://localhost:5000/api/health"
+networks:
+  paneladmin-network:
+    driver: bridge
