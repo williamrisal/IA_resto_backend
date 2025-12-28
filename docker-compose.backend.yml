@@ -1,4 +1,23 @@
+version: '3.8'
+
 services:
+  # LE SERVICE MANQUANT ÉTAIT ICI :
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=SecurePassword2024!
+      - MONGO_INITDB_DATABASE=resto-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    networks:
+      - paneladmin-network
+
   backend:
     build: .
     container_name: paneladmin_backend
