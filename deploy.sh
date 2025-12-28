@@ -1,44 +1,14 @@
-version: '3.8'
+#!/bin/bash
+echo "🚀 Déploiement du backend..."
 
-services:
-  # LE SERVICE MANQUANT ÉTAIT ICI :
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    restart: unless-stopped
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=SecurePassword2024!
-      - MONGO_INITDB_DATABASE=resto-db
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
-    networks:
-      - paneladmin-network
+# Nettoyage
+echo "🧹 Nettoyage Docker..."
+docker-compose down --remove-orphans 2>/dev/null || true
+docker system prune -f
 
-  backend:
-    build: .
-    container_name: paneladmin_backend
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:SecurePassword2024!@mongodb:27017/resto-db?authSource=admin
-      - PORT=5000
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-12345
-      - CLIENT_URL=http://myrestoia.s3-website.eu-north-1.amazonaws.com
-    depends_on:
-      - mongodb
-    networks:
-      - paneladmin-network
-    restart: unless-stopped
+# Lancement
+echo "🔨 Rebuild et démarrage..."
+docker-compose up -d --build
 
-volumes:
-  mongo_data:
-  mongo_config:
-
-networks:
-  paneladmin-network:
-    driver: bridge
+echo "📊 Statut :"
+docker ps
