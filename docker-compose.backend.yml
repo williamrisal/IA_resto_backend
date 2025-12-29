@@ -1,21 +1,4 @@
 services:
-  # LE SERVICE MONGO QU'IL TE MANQUAIT
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    restart: unless-stopped
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=SecurePassword2024!
-      - MONGO_INITDB_DATABASE=resto-db
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
-    networks:
-      - paneladmin-network
-
   backend:
     build: .
     container_name: paneladmin_backend
@@ -23,20 +6,13 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb+srv://williamrisal14_db_user:SecurePassword2024!@cluster0.no044om.mongodb.net/?appName=Cluster0
-
+      - MONGODB_URI=mongodb+srv://TON_USER_ATLAS:TON_PASSWORD_ATLAS@clusterXXXXX.mongodb.net/NOM_DE_TA_BDD?retryWrites=true&w=majority
       - PORT=5000
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-12345
+      - JWT_SECRET=ton_secret_jwt
       - CLIENT_URL=http://myrestoia.s3-website.eu-north-1.amazonaws.com
-    depends_on:
-      - mongodb
     networks:
       - paneladmin-network
     restart: unless-stopped
-
-volumes:
-  mongo_data:
-  mongo_config:
 
 networks:
   paneladmin-network:
