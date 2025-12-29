@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  # LE SERVICE MANQUANT ÉTAIT ICI :
+  # LE SERVICE MONGO QU'IL TE MANQUAIT
   mongodb:
     image: mongo:latest
     container_name: mongodb
