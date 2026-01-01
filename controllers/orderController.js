@@ -110,12 +110,20 @@ export const createOrder = async (req, res) => {
         const newOrder = new Order(orderData)
         const savedOrder = await newOrder.save()
         
-        // Envoyer automatiquement la confirmation SMS
-        if (!client.address) {
-            await sendConfirmationSMS(savedOrder)
-        }
-        else {
-            await SendSmS(savedOrder)
+        // Envoyer automatiquement la confirmation SMS (ne bloque pas l'enregistrement en cas d'erreur)
+        let smsStatus = { sent: false, error: null }
+        try {
+            if (!client.address) {
+                await sendConfirmationSMS(savedOrder)
+            }
+            else {
+                await SendSmS(savedOrder)
+            }
+            smsStatus.sent = true
+            console.log('✅ SMS envoyé avec succès')
+        } catch (smsError) {
+            console.error('⚠️ Erreur lors de l\'envoi du SMS (commande enregistrée):', smsError.message)
+            smsStatus.error = smsError.message
         }
         
         res.status(201).json({
@@ -128,6 +136,7 @@ export const createOrder = async (req, res) => {
                 phone: client.phoneNumber,
                 address: client.address,
             },
+            sms: smsStatus,
         })
     } catch (error) {
         res.status(400).json({
