@@ -13,6 +13,9 @@ router.get('/', menuController.getAllMenuItems)
 // GET - Récupère tous les menus d'une entreprise (avec query param ?entrepriseId=xxx)
 router.get('/entreprise', menuController.getMenuItemsByEntreprise)
 
+// GET - Récupère un article par nom (avec query param ?name=xxx&entrepriseId=xxx)
+router.get('/search', menuController.getMenuItemByName)
+
 // GET - Récupère un article par ID
 router.get('/:id', menuController.getMenuItemById)
 
@@ -27,5 +30,7 @@ router.put('/:id', menuController.updateMenuItem)
 
 // DELETE - Supprime un article
 router.delete('/:id', menuController.deleteMenuItem)
+
+
 
 export default router

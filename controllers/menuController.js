@@ -177,3 +177,49 @@ export const getMenuItemsByCategory = async (req, res) => {
         })
     }
 }
+
+/**
+ * Récupère un article par nom (avec query param ?name=xxx&entrepriseId=xxx)
+ */
+export const getMenuItemByName = async (req, res) => {
+    try {
+        const { name, entrepriseId } = req.query
+        
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le nom de l\'article est requis',
+            })
+        }
+
+        // Recherche insensible à la casse et aux espaces
+        const filter = {
+            name: { $regex: new RegExp(`^${name.trim()}$`, 'i') }
+        }
+        
+        // Si entrepriseId fourni, ajouter au filtre
+        if (entrepriseId) {
+            filter.entrepriseId = entrepriseId
+        }
+
+        const menuItem = await MenuItem.findOne(filter)
+        
+        if (!menuItem) {
+            return res.status(404).json({
+                success: false,
+                message: `Article "${name}" non trouvé`,
+            })
+        }
+        
+        res.status(200).json({
+            success: true,
+            data: menuItem,
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la recherche de l\'article',
+            error: error.message,
+        })
+    }
+}

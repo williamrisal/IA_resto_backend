@@ -1,5 +1,6 @@
 import Order from '../models/Order.js'
 import Client from '../models/Client.js'
+import MenuItem from '../models/MenuItem.js'
 import { sendConfirmationSMS, SendSmS } from '../controllers/smsController.js'
 import twilio from 'twilio'
 
@@ -106,6 +107,39 @@ export const createOrder = async (req, res) => {
                 zipCode: client.postalCode,
                 country: 'France',
             }
+        }
+
+        // Enrichir les items avec les données du menu si seulement les noms sont fournis
+        if (orderData.items && Array.isArray(orderData.items)) {
+            const enrichedItems = []
+            
+            for (const item of orderData.items) {
+                // Si l'item n'a pas de menuItemId mais a un nom, le chercher
+                if (!item.menuItemId && item.name) {
+                    const menuItem = await MenuItem.findOne({
+                        name: { $regex: new RegExp(`^${item.name.trim()}$`, 'i') },
+                        entrepriseId: entrepriseId
+                    })
+                    
+                    if (menuItem) {
+                        enrichedItems.push({
+                            menuItemId: menuItem._id,
+                            name: menuItem.name,
+                            quantity: item.quantity || 1,
+                            price: menuItem.price,
+                            subtotal: (item.quantity || 1) * menuItem.price
+                        })
+                    } else {
+                        // Si pas trouvé, garder l'item tel quel
+                        enrichedItems.push(item)
+                    }
+                } else {
+                    // Si menuItemId existe déjà, garder l'item tel quel
+                    enrichedItems.push(item)
+                }
+            }
+            
+            orderData.items = enrichedItems
         }
 
         const newOrder = new Order(orderData)
