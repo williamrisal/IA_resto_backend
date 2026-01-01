@@ -14,7 +14,7 @@ RUN npm install --omit=dev
 COPY . .
 
 # Expose the port
-EXPOSE 5000
+EXPOSE 5001
 
 # Start the application
 CMD ["npm", "start"]

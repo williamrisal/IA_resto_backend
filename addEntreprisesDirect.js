@@ -20,7 +20,7 @@ const entreprisesAjouJuli = [
         phone: '01 23 45 67 89',
         address: '123 Rue de Paris',
         city: 'Paris',
-        postalCode: '75000',
+        postalCode: '75001',
     },
     {
         name: 'Pâtes Italienne',

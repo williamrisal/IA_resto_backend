@@ -57,7 +57,7 @@ let orders = [
         orderId: 'CMD-001',
         type: 'Livraison',
         customer: { name: 'M. Dupont', phone: '0612345678', email: 'dupont@email.com' },
-        address: { street: '123 Rue de Paris', city: 'Paris', zipCode: '75000' },
+        address: { street: '123 Rue de Paris', city: 'Paris', zipCode: '75001' },
         items: [{ name: 'Pizza Margherita', quantity: 2, price: 12.50, subtotal: 25.00 }],
         total: 45.50,
         status: 'En cours',

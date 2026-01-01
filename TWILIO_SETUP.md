@@ -39,7 +39,7 @@ Body: {
 
 **Exemple de requête :**
 ```bash
-curl -X POST http://localhost:5000/api/sms/request-address \
+curl -X POST http://localhost:5001/api/sms/request-address \
   -H "Content-Type: application/json" \
   -d '{
     "phoneNumber": "0699766246",
@@ -97,8 +97,8 @@ brew install ngrok
 # Lancez votre serveur backend
 npm start
 
-# Dans un autre terminal, exposez le port 5000
-ngrok http 5000
+# Dans un autre terminal, exposez le port 5001
+ngrok http 5001
 ```
 
 Ngrok vous donnera une URL publique comme : `https://abc123.ngrok.io`
@@ -133,7 +133,7 @@ Le système détecte automatiquement la dernière commande du client et répond 
 
 #### 1. Vous demandez l'adresse au client via l'API :
 ```bash
-curl -X POST http://localhost:5000/api/sms/request-address \
+curl -X POST http://localhost:5001/api/sms/request-address \
   -H "Content-Type: application/json" \
   -d '{"phoneNumber": "0699766246"}'
 ```
