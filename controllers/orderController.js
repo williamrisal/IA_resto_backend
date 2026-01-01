@@ -90,6 +90,7 @@ export const createOrder = async (req, res) => {
                 message: `Aucun client trouvé avec le numéro ${phoneNumber}`,
             })
         }
+        console.log('👤 Client trouvé', client._id)
 
         // Enrichir les données de la commande avec les infos du client
         const orderData = {
@@ -141,7 +142,7 @@ export const createOrder = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'Erreur lors de la création de la commande',
+            message: 'Erreur Twillio lors de la création de la commande',
             error: error.message,
         })
     }
