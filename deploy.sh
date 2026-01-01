@@ -1,14 +1,37 @@
 #!/bin/bash
+
+# Script de déploiement rapide pour le backend
+# Usage: ./deploy.sh
+
 echo "🚀 Déploiement du backend..."
 
-# Nettoyage
+# Récupérer les dernières modifications
+echo "📥 Git pull..."
+git pull origin main
+
+# Nettoyer les conteneurs et images orphelins
 echo "🧹 Nettoyage Docker..."
-docker-compose down --remove-orphans 2>/dev/null || true
+docker-compose down 2>/dev/null || true
+docker rm -f paneladmin_backend 2>/dev/null || true
 docker system prune -f
 
-# Lancement
-echo "🔨 Rebuild et démarrage..."
-docker-compose up -d --build
+# Rebuild et redémarrer le conteneur
+echo "🔨 Rebuild de l'image Docker..."
+docker-compose up -d --build backend
 
-echo "📊 Statut :"
+# Attendre que le conteneur démarre
+echo "⏳ Démarrage du conteneur..."
+sleep 5
+
+# Vérifier le statut
+echo ""
+echo "📊 Statut des conteneurs:"
 docker ps
+
+echo ""
+echo "📋 Derniers logs:"
+docker logs paneladmin_backend --tail 20
+
+echo ""
+echo "✅ Déploiement terminé!"
+echo "🔗 Test: curl http://0.0.0.0:5000/api/health"
